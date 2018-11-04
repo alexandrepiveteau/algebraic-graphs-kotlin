@@ -24,22 +24,28 @@
 
 package com.github.alexandrepiveteau.algebraicGraphs
 
-operator fun <V> Graph<V>.plus(other: Graph<V>): Graph<V> =
-    Graph.Union(this, other)
+fun <V1, V2> Graph<V1>.flatMap(f: (V1) -> Graph<V2>): Graph<V2> =
+    map { f(it) }.flatten()
 
-operator fun <V> Graph<V>.minus(vertex: V): Graph<V> =
-    filter { v1 -> v1 != vertex }
+fun <V1> Graph<Graph<V1>>.flatten(): Graph<V1> = when (this) {
+    is Graph.Empty -> Graph.empty()
+    is Graph.Vertex -> vertex
+    is Graph.Union -> Graph.union(a.flatten(), b.flatten())
+    is Graph.Connect -> Graph.connect(a.flatten(), b.flatten())
+}
 
-operator fun <V> Graph<V>.times(other: Graph<V>): Graph<V> =
-    Graph.Connect(this, other)
+fun <V1, V2> Graph<V1>.map(f: (V1) -> V2): Graph<V2> = when (this) {
+    is Graph.Empty -> Graph.empty()
+    is Graph.Vertex -> Graph.vertex(f(vertex))
+    is Graph.Union -> Graph.union(a.map(f), b.map(f))
+    is Graph.Connect -> Graph.connect(a.map(f), b.map(f))
+}
 
-operator fun <V> Graph<V>.contains(other: Graph<V>): Boolean =
-    this + other == this
+fun <V1> Graph<V1>.filter(f: (V1) -> Boolean): Graph<V1> =
+    map { v1 -> if (f((v1))) Graph.vertex(v1) else Graph.empty() }.flatten()
 
-operator fun <V> Graph<V>.compareTo(other: Graph<V>): Int =
-    when {
-        this in other && other in this -> 0
-        other in this -> 1
-        this in other -> -1
-        else -> 0
-    }
+fun <V1, V2> Graph<V1>.zip2(a: Graph<V2>): Graph<Pair<V1, V2>> =
+    flatMap { t1 -> a.map { t2 -> t1 to t2 } }
+
+fun <V1, V2, V3> Graph<V1>.zip3(a: Graph<V2>, b: Graph<V3>): Graph<Triple<V1, V2, V3>> =
+    flatMap { t1 -> a.flatMap { t2 -> b.map { t3 -> Triple(t1, t2, t3) } } }
