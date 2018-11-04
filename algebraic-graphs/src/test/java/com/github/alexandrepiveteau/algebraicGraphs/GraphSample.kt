@@ -36,8 +36,11 @@ class GraphSample {
         val a = Graph.clique("a", "b")
         val b = Graph.clique("a", "c")
 
+        val g = Graph.clique(IntRange(start = 0, endInclusive = 10))
+
         println(a in b)
         println(b in a)
         println(a == b)
+        println(g.edges().joinToString(prefix = "[", postfix = "]"))
     }
 }

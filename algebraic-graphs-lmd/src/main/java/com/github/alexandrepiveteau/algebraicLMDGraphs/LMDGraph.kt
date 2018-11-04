@@ -86,7 +86,7 @@ sealed class LMDGraph<V, L> {
             clique(label, elements.asIterable())
 
         fun <V, L> clique(label: L, elements: Iterable<V>): LMDGraph<V, L> =
-            elements.fold(empty()) { g, a -> product(label, vertex(a), g) }
+            elements.fold(empty()) { g, a -> product(label, vertex(a), g) + product(label, g, vertex(a)) }
 
         fun <V, L> vertices(vararg elements: V): LMDGraph<V, L> =
             vertices(elements.asIterable())

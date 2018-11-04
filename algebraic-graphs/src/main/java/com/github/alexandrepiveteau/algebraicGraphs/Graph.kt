@@ -85,7 +85,7 @@ sealed class Graph<V> {
             clique(elements.asIterable())
 
         fun <V> clique(elements: Iterable<V>): Graph<V> =
-            elements.fold(empty()) { g, e -> vertex(e) * g }
+            elements.fold(empty()) { g, e -> vertex(e) * g + g * vertex(e) }
 
         fun <V> vertices(vararg elements: V): Graph<V> =
             vertices(elements.asIterable())
