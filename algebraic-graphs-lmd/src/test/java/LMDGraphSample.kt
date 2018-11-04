@@ -22,27 +22,33 @@
  * SOFTWARE.
  */
 
-package com.github.alexandrepiveteau.algebraicGraphs
+import com.github.alexandrepiveteau.algebraicLMDGraphs.LMDGraph
+import com.github.alexandrepiveteau.algebraicLMDGraphs.plus
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.JUnit4
 
-operator fun <V> Graph<V>.plus(other: Graph<V>): Graph<V> =
-    Graph.union(this, other)
+@RunWith(JUnit4::class)
+class LMDGraphSample {
 
-operator fun <V> Graph<V>.minus(vertex: V): Graph<V> =
-    filter { v1 -> v1 != vertex }
+    @Test
+    fun sample() {
 
-operator fun <V1> Graph<V1>.minus(e: Pair<V1, V1>): Graph<V1> =
-    filterEdge(e.first, e.second)
+        val e0 = LMDGraph.vertices<Int, String>(0..3000)
+        val e1 = LMDGraph.edge(1, 2, "a")
+        val e2 = LMDGraph.edge(1, 2, "a")
+        val g = e0 + e1 + e2
 
-operator fun <V> Graph<V>.times(other: Graph<V>): Graph<V> =
-    Graph.product(this, other)
+        println("e1 : $e1")
+        println("e2 : $e2")
+        println("g : $g")
+        println("g.vertices : ${g.verticesToString()}")
+        println("g.edges : ${g.edgesToString()}")
 
-operator fun <V> Graph<V>.contains(other: Graph<V>): Boolean =
-    this + other == this
-
-operator fun <V> Graph<V>.compareTo(other: Graph<V>): Int =
-    when {
-        this in other && other in this -> 0
-        other in this -> 1
-        this in other -> -1
-        else -> 0
+        println("Hello world.")
     }
+
+    fun <T> Iterable<T>.joinToStringFormatted(): String = joinToString(prefix = "[", postfix = "]", separator = ", ", limit = 10)
+    fun <V, L> LMDGraph<V, L>.edgesToString(): String = edges().joinToStringFormatted()
+    fun <V, L> LMDGraph<V, L>.verticesToString(): String = vertices().joinToStringFormatted()
+}

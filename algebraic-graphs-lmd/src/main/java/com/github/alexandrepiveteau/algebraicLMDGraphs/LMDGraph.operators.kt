@@ -30,6 +30,9 @@ operator fun <V, L> LMDGraph<V, L>.plus(other: LMDGraph<V, L>): LMDGraph<V, L> =
 operator fun <V, L> LMDGraph<V, L>.minus(vertex: V): LMDGraph<V, L> =
     filter { v1 -> v1 != vertex }
 
+operator fun <V1, L> LMDGraph<V1, L>.minus(e: Pair<V1, V1>): LMDGraph<V1, L> =
+    filterEdges(e.first, e.second)
+
 operator fun <V, L> LMDGraph<V, L>.contains(other: LMDGraph<V, L>): Boolean =
     this + other == this
 

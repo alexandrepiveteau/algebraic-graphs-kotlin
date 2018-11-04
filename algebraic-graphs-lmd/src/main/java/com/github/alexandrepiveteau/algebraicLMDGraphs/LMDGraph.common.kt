@@ -44,6 +44,20 @@ fun <V1, V2, L> LMDGraph<V1, L>.map(f: (V1) -> V2): LMDGraph<V2, L> = when (this
 fun <V1, L> LMDGraph<V1, L>.filter(f: (V1) -> Boolean): LMDGraph<V1, L> =
     map { v1 -> if (f((v1))) LMDGraph.vertex<V1, L>(v1) else LMDGraph.empty() }.flatten()
 
+// TODO : Make sure this method actually makes some sense.
+fun <V1, L> LMDGraph<V1, L>.filterEdges(from: V1, to: V1): LMDGraph<V1, L> = when (this) {
+    is LMDGraph.Empty -> LMDGraph.empty()
+    is LMDGraph.Vertex -> LMDGraph.vertex(vertex)
+    is LMDGraph.Union -> LMDGraph.union(a, b)
+    is LMDGraph.Product -> {
+        val au = a - from
+        val buv = b.filterEdges(from, to)
+        val auv = a.filterEdges(from, to)
+        val bv = b - to
+        LMDGraph.product(label, au, buv) + LMDGraph.product(label, auv, bv)
+    }
+}
+
 fun <V1, V2, L> LMDGraph<V1, L>.zip2(a: LMDGraph<V2, L>): LMDGraph<Pair<V1, V2>, L> =
     flatMap { t1 -> a.map { t2 -> t1 to t2 } }
 

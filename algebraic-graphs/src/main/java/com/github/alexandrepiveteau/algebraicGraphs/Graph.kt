@@ -28,20 +28,20 @@ sealed class Graph<V> {
     class Empty<V> : Graph<V>()
     class Vertex<V>(val vertex: V) : Graph<V>()
     class Union<V>(val a: Graph<V>, val b: Graph<V>) : Graph<V>()
-    class Connect<V>(val a: Graph<V>, val b: Graph<V>) : Graph<V>()
+    class Product<V>(val a: Graph<V>, val b: Graph<V>) : Graph<V>()
 
     fun vertices(): Set<V> = when (this) {
         is Empty -> emptySet()
         is Vertex -> setOf(vertex)
         is Union -> a.vertices() union b.vertices()
-        is Connect -> a.vertices() union b.vertices()
+        is Product -> a.vertices() union b.vertices()
     }
 
     fun edges(): Set<Pair<V, V>> = when (this) {
         is Empty -> emptySet()
         is Vertex -> emptySet()
         is Union -> a.edges() union b.edges()
-        is Connect -> a.edges() union b.edges() union (a.vertices().flatMap { va ->
+        is Product -> a.edges() union b.edges() union (a.vertices().flatMap { va ->
             b.vertices().map { vb -> va to vb }
         })
     }
@@ -61,7 +61,7 @@ sealed class Graph<V> {
         is Empty -> "()"
         is Vertex -> "($vertex)"
         is Union -> "$a+$b"
-        is Connect -> "$a*$b"
+        is Product -> "$a*$b"
     }
 
     companion object Factory {
@@ -75,8 +75,8 @@ sealed class Graph<V> {
         fun <V> vertex(vertex: V): Graph<V> =
             Vertex(vertex)
 
-        fun <V> connect(a: Graph<V>, b: Graph<V>): Graph<V> =
-            Connect(a, b)
+        fun <V> product(a: Graph<V>, b: Graph<V>): Graph<V> =
+            Product(a, b)
 
         fun <V> edge(from: V, to: V): Graph<V> =
             vertex(from) * vertex(to)
