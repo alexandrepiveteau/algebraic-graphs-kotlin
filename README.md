@@ -1,4 +1,4 @@
-# functional-kotlin
+# algebraic-graphs-kotlin
 
 [![](https://jitpack.io/v/alexandrepiveteau/algebraic-graphs-kotlin.svg)](https://jitpack.io/#alexandrepiveteau/algebraic-graphs-kotlin)
 
@@ -23,7 +23,7 @@ You can now add the library modules in your application **build.gradle** file :
 ```
 dependencies {
     implementation "com.github.alexandrepiveteau.algebraic-graphs-kotlin:algebraic-graphs:0.2.0"
-    implementation "com.github.alexandrepiveteau.algebraic-graphs-kotlin:algebraic-graphs-lmd:0.2.0"
+    implementation "com.github.alexandrepiveteau.algebraic-graphs-kotlin:algebraic-graphs-lmd:0.2.0" // BROKEN
 }
 ```
 
