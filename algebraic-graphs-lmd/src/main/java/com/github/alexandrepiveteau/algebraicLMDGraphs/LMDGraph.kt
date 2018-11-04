@@ -22,33 +22,34 @@
  * SOFTWARE.
  */
 
-package com.github.alexandrepiveteau.algebraicGraphs
+package com.github.alexandrepiveteau.algebraicLMDGraphs
 
-sealed class Graph<V> {
-    class Empty<V> : Graph<V>()
-    class Vertex<V>(val vertex: V) : Graph<V>()
-    class Union<V>(val a: Graph<V>, val b: Graph<V>) : Graph<V>()
-    class Connect<V>(val a: Graph<V>, val b: Graph<V>) : Graph<V>()
+// Labelled Multidigraph with distinct labels.
+sealed class LMDGraph<V, L> {
+    class Empty<V, L> : LMDGraph<V, L>()
+    class Vertex<V, L>(val vertex: V) : LMDGraph<V, L>()
+    class Union<V, L>(val a: LMDGraph<V, L>, val b: LMDGraph<V, L>) : LMDGraph<V, L>()
+    class Product<V, L>(val label: L, val a: LMDGraph<V, L>, val b: LMDGraph<V, L>) : LMDGraph<V, L>()
 
     fun vertices(): Set<V> = when (this) {
         is Empty -> emptySet()
         is Vertex -> setOf(vertex)
         is Union -> a.vertices() union b.vertices()
-        is Connect -> a.vertices() union b.vertices()
+        is Product -> a.vertices() union b.vertices()
     }
 
-    fun edges(): Set<Pair<V, V>> = when (this) {
+    fun edges(): Set<Triple<L, V, V>> = when (this) {
         is Empty -> emptySet()
         is Vertex -> emptySet()
         is Union -> a.edges() union b.edges()
-        is Connect -> a.edges() union b.edges() union (a.vertices().flatMap { va ->
-            b.vertices().map { vb -> va to vb }
+        is Product -> a.edges() union b.edges() union (a.vertices().flatMap { va ->
+            b.vertices().map { vb -> Triple(label, va, vb) }
         })
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is Graph<*>) return false
+        if (other !is LMDGraph<*, *>) return false
 
         return (vertices() == other.vertices()) && (edges() == other.edges())
     }
@@ -61,42 +62,42 @@ sealed class Graph<V> {
         is Empty -> "()"
         is Vertex -> "($vertex)"
         is Union -> "$a+$b"
-        is Connect -> "$a*$b"
+        is Product -> "$a*[$label]*$b"
     }
 
     companion object Factory {
 
-        fun <V> empty(): Graph<V> =
+        fun <V, L> empty(): LMDGraph<V, L> =
             Empty()
 
-        fun <V> union(a: Graph<V>, b: Graph<V>): Graph<V> =
+        fun <V, L> union(a: LMDGraph<V, L>, b: LMDGraph<V, L>): LMDGraph<V, L> =
             Union(a, b)
 
-        fun <V> vertex(vertex: V): Graph<V> =
+        fun <V, L> vertex(vertex: V): LMDGraph<V, L> =
             Vertex(vertex)
 
-        fun <V> connect(a: Graph<V>, b: Graph<V>): Graph<V> =
-            Connect(a, b)
+        fun <V, L> product(label: L, a: LMDGraph<V, L>, b: LMDGraph<V, L>): LMDGraph<V, L> =
+            Product(label, a, b)
 
-        fun <V> edge(from: V, to: V): Graph<V> =
-            vertex(from) * vertex(to)
+        fun <V, L> edge(from: V, to: V, label: L): LMDGraph<V, L> =
+            product(label, vertex(from), vertex(to))
 
-        fun <V> clique(vararg elements: V): Graph<V> =
-            clique(elements.asIterable())
+        fun <V, L> clique(label: L, vararg elements: V): LMDGraph<V, L> =
+            clique(label, elements.asIterable())
 
-        fun <V> clique(elements: Iterable<V>): Graph<V> =
-            elements.fold(empty()) { g, e -> vertex(e) * g }
+        fun <V, L> clique(label: L, elements: Iterable<V>): LMDGraph<V, L> =
+            elements.fold(empty()) { g, a -> product(label, vertex(a), g) }
 
-        fun <V> vertices(vararg elements: V): Graph<V> =
+        fun <V, L> vertices(vararg elements: V): LMDGraph<V, L> =
             vertices(elements.asIterable())
 
-        fun <V> vertices(elements: Iterable<V>): Graph<V> =
-            elements.fold(empty()) { g, e -> vertex(e) + g }
+        fun <V, L> vertices(elements: Iterable<V>): LMDGraph<V, L> =
+            elements.fold(empty()) { g, a -> union(vertex(a), g) }
 
-        fun <V> star(center: V, vararg elements: V): Graph<V> =
-            star(center, elements.asIterable())
+        fun <V, L> star(label: L, center: V, vararg elements: V): LMDGraph<V, L> =
+            star(label, center, elements.asIterable())
 
-        fun <V> star(center: V, elements: Iterable<V>): Graph<V> =
-            vertex(center) * vertices(elements.asIterable())
+        fun <V, L> star(label: L, center: V, elements: Iterable<V>): LMDGraph<V, L> =
+            product(label, vertex(center), vertices(elements))
     }
 }

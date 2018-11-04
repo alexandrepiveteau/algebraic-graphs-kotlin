@@ -22,17 +22,22 @@
  * SOFTWARE.
  */
 
-apply plugin: 'java-library'
-apply plugin: 'kotlin'
-apply plugin: 'com.github.dcendents.android-maven'
+package com.github.alexandrepiveteau.algebraicGraphs
 
-group='com.github.alexandrepiveteau'
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.JUnit4
 
-dependencies {
-    testImplementation "junit:junit:4.12"
+@RunWith(JUnit4::class)
+class GraphSample {
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.3.0"
+    @Test
+    fun sample() {
+        val a = Graph.clique("a", "b")
+        val b = Graph.clique("a", "c")
+
+        println(a in b)
+        println(b in a)
+        println(a == b)
+    }
 }
-
-sourceCompatibility = "1.7"
-targetCompatibility = "1.7"

@@ -22,17 +22,21 @@
  * SOFTWARE.
  */
 
-apply plugin: 'java-library'
-apply plugin: 'kotlin'
-apply plugin: 'com.github.dcendents.android-maven'
+package com.github.alexandrepiveteau.algebraicLMDGraphs
 
-group='com.github.alexandrepiveteau'
+operator fun <V, L> LMDGraph<V, L>.plus(other: LMDGraph<V, L>): LMDGraph<V, L> =
+    LMDGraph.union(this, other)
 
-dependencies {
-    testImplementation "junit:junit:4.12"
+operator fun <V, L> LMDGraph<V, L>.minus(vertex: V): LMDGraph<V, L> =
+    filter { v1 -> v1 != vertex }
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.3.0"
-}
+operator fun <V, L> LMDGraph<V, L>.contains(other: LMDGraph<V, L>): Boolean =
+    this + other == this
 
-sourceCompatibility = "1.7"
-targetCompatibility = "1.7"
+operator fun <V, L> LMDGraph<V, L>.compareTo(other: LMDGraph<V, L>): Int =
+    when {
+        this in other && other in this -> 0
+        other in this -> 1
+        this in other -> -1
+        else -> 0
+    }
