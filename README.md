@@ -22,7 +22,7 @@ You can now add the library modules in your application **build.gradle** file :
 
 ```
 dependencies {
-    implementation "com.github.alexandrepiveteau.algebraic-graphs-kotlin:algebraic-graphs:0.3.0"
+    implementation "com.github.alexandrepiveteau:algebraic-graphs-kotlin:0.3.0"
 }
 ```
 
