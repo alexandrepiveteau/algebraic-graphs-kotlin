@@ -33,4 +33,4 @@ The library contains the following modules :
 
 ## Credits
 
-The library is based on the paper [Algebraic Graphs with Class](https://github.com/snowleopard/alga-paper).
+The library is based on the paper [Algebraic Graphs with Class](https://github.com/snowleopard/alga-paper) by @snowleopard.
