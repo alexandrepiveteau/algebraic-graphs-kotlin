@@ -24,4 +24,3 @@
 
 include ':app'
 include ':algebraic-graphs'
-include ':algebraic-graphs-lmd'

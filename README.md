@@ -22,8 +22,7 @@ You can now add the library modules in your application **build.gradle** file :
 
 ```
 dependencies {
-    implementation "com.github.alexandrepiveteau.algebraic-graphs-kotlin:algebraic-graphs:0.2.0"
-    implementation "com.github.alexandrepiveteau.algebraic-graphs-kotlin:algebraic-graphs-lmd:0.2.0" // BROKEN
+    implementation "com.github.alexandrepiveteau.algebraic-graphs-kotlin:algebraic-graphs:0.3.0"
 }
 ```
 
@@ -31,7 +30,6 @@ dependencies {
 The library contains the following modules :
 
 - **algebraic-graphs** - Offers some utilities for working with algebraic graphs.
-- **algebraic-graphs** - Offers an experimental, and probably unsound implementation of labelled multidigraph with distinct labels.
 
 ## Credits
 
