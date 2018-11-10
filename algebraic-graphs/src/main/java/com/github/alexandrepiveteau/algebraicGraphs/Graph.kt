@@ -27,21 +27,21 @@ package com.github.alexandrepiveteau.algebraicGraphs
 sealed class Graph<V> {
     class Empty<V> : Graph<V>()
     class Vertex<V>(val vertex: V) : Graph<V>()
-    class Union<V>(val a: Graph<V>, val b: Graph<V>) : Graph<V>()
-    class Product<V>(val a: Graph<V>, val b: Graph<V>) : Graph<V>()
+    class Overlay<V>(val a: Graph<V>, val b: Graph<V>) : Graph<V>()
+    class Connect<V>(val a: Graph<V>, val b: Graph<V>) : Graph<V>()
 
     fun vertices(): Set<V> = when (this) {
         is Empty -> emptySet()
         is Vertex -> setOf(vertex)
-        is Union -> a.vertices() union b.vertices()
-        is Product -> a.vertices() union b.vertices()
+        is Overlay -> a.vertices() union b.vertices()
+        is Connect -> a.vertices() union b.vertices()
     }
 
     fun edges(): Set<Pair<V, V>> = when (this) {
         is Empty -> emptySet()
         is Vertex -> emptySet()
-        is Union -> a.edges() union b.edges()
-        is Product -> a.edges() union b.edges() union (a.vertices().flatMap { va ->
+        is Overlay -> a.edges() union b.edges()
+        is Connect -> a.edges() union b.edges() union (a.vertices().flatMap { va ->
             b.vertices().map { vb -> va to vb }
         })
     }
@@ -57,11 +57,17 @@ sealed class Graph<V> {
         return 31 * vertices().hashCode() + edges().hashCode()
     }
 
-    override fun toString(): String = when (this) {
-        is Empty -> "()"
-        is Vertex -> "($vertex)"
-        is Union -> "$a+$b"
-        is Product -> "$a*$b"
+    override fun toString(): String {
+        fun go(p: Boolean, g: Graph<V>): String = when (g) {
+            is Empty -> "empty"
+            is Vertex -> g.vertex.toString()
+            is Overlay -> if (p) "(${go(false, g)})" else "${go(
+                false,
+                g.a
+            )} + ${go(false, g.b)}"
+            is Connect -> "${go(true, g.a)} * ${go(true, g.b)}"
+        }
+        return go(false, this)
     }
 
     companion object Factory {
@@ -69,14 +75,14 @@ sealed class Graph<V> {
         fun <V> empty(): Graph<V> =
             Empty()
 
-        fun <V> union(a: Graph<V>, b: Graph<V>): Graph<V> =
-            Union(a, b)
+        fun <V> overlay(a: Graph<V>, b: Graph<V>): Graph<V> =
+            Overlay(a, b)
 
         fun <V> vertex(vertex: V): Graph<V> =
             Vertex(vertex)
 
-        fun <V> product(a: Graph<V>, b: Graph<V>): Graph<V> =
-            Product(a, b)
+        fun <V> connect(a: Graph<V>, b: Graph<V>): Graph<V> =
+            Connect(a, b)
 
         fun <V> edge(from: V, to: V): Graph<V> =
             vertex(from) * vertex(to)
@@ -98,5 +104,16 @@ sealed class Graph<V> {
 
         fun <V> star(center: V, elements: Iterable<V>): Graph<V> =
             vertex(center) * vertices(elements.asIterable())
+
+        fun <V> biclique(a: List<V>, b: List<V>): Graph<V> =
+            vertices(a) * vertices(b)
+
+        fun <V1, V2> box(a: Graph<V1>, b: Graph<V2>): Graph<Pair<V1, V2>> {
+            val xs =
+                b.vertices().asSequence().map { xb -> a.map { xa -> xa to xb } }
+            val xy =
+                a.vertices().asSequence().map { xa -> b.map { xb -> xa to xb } }
+            return xs.plus(xy).fold(empty()) { xa, xb -> xa + xb }
+        }
     }
 }

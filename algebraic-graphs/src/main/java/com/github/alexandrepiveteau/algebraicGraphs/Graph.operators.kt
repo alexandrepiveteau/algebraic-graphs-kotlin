@@ -25,7 +25,7 @@
 package com.github.alexandrepiveteau.algebraicGraphs
 
 operator fun <V> Graph<V>.plus(other: Graph<V>): Graph<V> =
-    Graph.union(this, other)
+    Graph.overlay(this, other)
 
 operator fun <V> Graph<V>.minus(vertex: V): Graph<V> =
     filter { v1 -> v1 != vertex }
@@ -34,7 +34,7 @@ operator fun <V1> Graph<V1>.minus(e: Pair<V1, V1>): Graph<V1> =
     filterEdge(e.first, e.second)
 
 operator fun <V> Graph<V>.times(other: Graph<V>): Graph<V> =
-    Graph.product(this, other)
+    Graph.connect(this, other)
 
 operator fun <V> Graph<V>.contains(other: Graph<V>): Boolean =
     this + other == this
